@@ -12,9 +12,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.run_app_rma.data.remote.AuthRepository
 import com.example.run_app_rma.sensor.tracking.LocationService
 import com.example.run_app_rma.sensor.tracking.SensorService
 import com.example.run_app_rma.ui.theme.Run_app_RMATheme
+import com.example.run_app_rma.presentation.login.LoginScreen
 
 class MainActivity : ComponentActivity() {
 
@@ -39,12 +41,25 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             Run_app_RMATheme {
+                val authRepository = remember { AuthRepository() }
+                var isLoggedIn by remember { mutableStateOf(authRepository.isLoggedIn()) }
+
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    SensorDataScreen(
-                        modifier = Modifier.padding(innerPadding),
-                        locationService = locationService,
-                        sensorService = sensorService
-                    )
+                    if (isLoggedIn) {
+                        SensorDataScreen(
+                            modifier = Modifier.padding(innerPadding),
+                            locationService = locationService,
+                            sensorService = sensorService,
+                            onLogout = {
+                                authRepository.logout()
+                                isLoggedIn = false
+                            }
+                        )
+                    } else {
+                        LoginScreen(authRepository = authRepository) {
+                            isLoggedIn = true
+                        }
+                    }
                 }
             }
         }
@@ -55,18 +70,17 @@ class MainActivity : ComponentActivity() {
 fun SensorDataScreen(
     modifier: Modifier = Modifier,
     locationService: LocationService,
-    sensorService: SensorService
+    sensorService: SensorService,
+    onLogout: () -> Unit
 ) {
     var locationText by remember { mutableStateOf("Waiting for location...") }
     var accelerometerText by remember { mutableStateOf("Waiting for accelerometer...") }
     var gyroscopeText by remember { mutableStateOf("Waiting for gyroscope...") }
 
-    // Start/Stop listeners with DisposableEffect
     DisposableEffect(Unit) {
         locationService.startLocationUpdates { location ->
             locationText = "Lat: ${location.latitude}, Lng: ${location.longitude}"
         }
-
         sensorService.startListening(
             onAccelerometerData = { values ->
                 accelerometerText = "Acc -> X:${values[0]}, Y:${values[1]}, Z:${values[2]}"
@@ -75,7 +89,6 @@ fun SensorDataScreen(
                 gyroscopeText = "Gyro -> X:${values[0]}, Y:${values[1]}, Z:${values[2]}"
             }
         )
-
         onDispose {
             locationService.stopLocationUpdates()
             sensorService.stopListening()
@@ -91,8 +104,16 @@ fun SensorDataScreen(
         Text(text = locationText)
         Text(text = accelerometerText)
         Text(text = gyroscopeText)
+
+        Button(
+            onClick = onLogout,
+            modifier = Modifier.padding(top = 24.dp)
+        ) {
+            Text("Logout")
+        }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
