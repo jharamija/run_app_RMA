@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "598225744203",
+    "project_id": "runningapprma",
+    "storage_bucket": "runningapprma.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:598225744203:android:9290f02ef02ce1316338ce",
+        "android_client_info": {
+          "package_name": "com.example.run_app_rma"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLRinT1Gc4v0QzBsBfLe05ROUhxbtcL3Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
