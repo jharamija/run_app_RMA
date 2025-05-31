@@ -12,7 +12,7 @@ import androidx.room.PrimaryKey
         childColumns = ["runId"],
         onDelete = ForeignKey.Companion.CASCADE
     )],
-    indices = [Index("RunId")]
+    indices = [Index("runId")]
 )
 data class SensorDataEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
